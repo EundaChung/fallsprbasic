@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.domain.Board;
+import com.example.demo.service.BoardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,9 +15,21 @@ import java.util.Map;
 @RequestMapping("/api/board")
 @RestController
 public class BoardRestController {
-    List<Map<String, Object>> boardList = new ArrayList<>();
+
+    private final BoardService boardService;
+    public BoardRestController(
+            BoardService boardService
+    ) {
+        this.boardService = boardService;
+    }
+
+    //List<Map<String, Object>> boardList = new ArrayList<>();
     @GetMapping("/create")
     public Map<String, Object> create(@RequestParam Map<String, Object> params){
+        return boardService.createBoard(params);
+        /*
+        이전에 컨트롤러 필드에 저장해보는 코드
+
         String title = (String) params.get("title");
         String content = params.get("content") + "";
         String author = params.get("author") + "";
@@ -29,31 +43,31 @@ public class BoardRestController {
         boardList.add(boardMap);
 
         System.out.println(boardList);
-
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("resultCode", 200);
-
-        return resultMap;
+        */
     }
-    @GetMapping("/list") //이 안에 있는 주소값은 꼭 유니크해야함
-    public List<Map<String, Object>> list(){
-        return boardList;
+    @GetMapping("/list")
+    public List<Board> list(){
+        return boardService.listBoard();
+        //return boardList;
     }
-    @GetMapping("/detail") //이 안에 있는 주소값은 꼭 유니크해야함
-    public Map<String, Object> detail(@RequestParam String order){
-
-        int index = Integer.parseInt(order) - 1;
+    @GetMapping("/detail") //이 안에 있는 주소값은 꼭 유니크해야함!!
+    public Board detail(@RequestParam Integer id){
+        return boardService.detailBoard(id);
+        /*int index = Integer.parseInt(order) - 1;
         Map<String, Object> boardMap = boardList.get(index);
 
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("resultCode", 200);
         resultMap.put("detail_board", boardMap);
-
         return resultMap;
+        */
+
     }
     @GetMapping("/update")
     public Map<String, Object> update(@RequestParam Map<String, Object> params){
-
+        /*
         int index = Integer.parseInt(params.get("order") + "") - 1;
         Map<String, Object> boardMap = boardList.get(index);
         boardMap.put("title", params.get("title"));
@@ -66,5 +80,11 @@ public class BoardRestController {
         //resultMap.put("detail_board", boardMap);
 
         return resultMap;
+        */
+        return boardService.updateBoard(params);
+    }
+    @GetMapping("/delete")
+    public Map<String, Object> delete(@RequestParam Map<String, Object> params){
+        return boardService.deleteBoard(Integer.parseInt(params.get("id") + ""));
     }
 }
